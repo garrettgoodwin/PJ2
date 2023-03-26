@@ -1,0 +1,22 @@
+declarations → typeDeclarations variableDeclarations
+typeDeclarations → TYPE typeDeclarationList | EPSILON
+typeDeclarationList → typeDeclaration { typeDeclaration }
+typeDeclaration → idList COLON typeName SEMICOLON
+typeName → BOOLEAN | INT | LONG | REAL | STRING | ID
+variableDeclarations → VAR variableDeclarationList | EPSILON
+variableDeclarationList → variableDeclaration { variableDeclaration }
+variableDeclaration → idList COLON typeName SEMICOLON
+idList → ID { COMMA ID }
+
+body → LeftBRACE statementList RightBRACE
+statementList → statement { statement }
+statement → whileStatement | assignStatement | doStatement
+whileStatement → WHILE conditional body
+assignStatement → ID EQUAL expression SEMICOLON
+doStatement → DO body WHILE conditional SEMICOLON
+expression → term PLUS expression | term MINUS expression | term
+term → factor MULT term | factor DIV term | factor
+factor → LeftPAREN expression RightPAREN | ID | NUM | RealNUM
+conditional → ID | primary relationalOperator primary
+primary → ID | NUM | RealNUM
+relationalOperator → EQUAL | NotEQUAL | GREATER | GTEQ | LESS | LTEQ
