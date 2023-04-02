@@ -17,40 +17,37 @@ void Parser::Parse(TokenList* tokens)
 {
     int tokenCounter = 1;
 
-    //cout << "Begin Parser" << endl;
     Declarations(&tokenCounter, tokens);
+
+    ParseBody(&tokenCounter, tokens);
+
+    ListAllPresentTypes();
 }
 
 //CONFIDENT: declarations → typeDeclarations variableDeclarations
 void Parser::Declarations(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED DECLARATION" << endl;
-
     //Type Declarations
     TypeDeclarations(tokenCounter, tokens);
+
+    //Test
+    PrintTypeDeclarations();
+
+    //PrintStatementLists
 
     //Varaible Declarations
     VariableDeclarations(tokenCounter, tokens);
 
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED DECLARATION" << endl;
+    //Test
+    PrintVariableDeclarations();
 }
 
 //CONFIDENT: typeDeclarations → TYPE typeDeclarationList | EPSILON
 void Parser::TypeDeclarations(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED TYPEDECLARATIONS" << endl;
-
     //Type
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //TEMPORARY PRINT OUT
-    printf("Read: %s ", newToken->GetString());
-	printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-    if(newToken->GetType() == TokenType::TYPE)
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::TYPE)
     {
         (*tokenCounter)++;
 
@@ -58,76 +55,57 @@ void Parser::TypeDeclarations(int* tokenCounter, TokenList* tokens)
         TypeDeclarationsList(tokenCounter, tokens);
     }
     else
-        cout << "NOT OF TYPE: TYPE" << endl;
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED TYPEDECLARATIONS" << endl;
+    {
+        //Not Sure if I should exit here
+        cout << "NOT  " << endl;
+        exit(1);
+    }
 }
 
 //CONFIDENT: typeDeclarationList → typeDeclaration { typeDeclaration }
 void Parser::TypeDeclarationsList(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED TYPEDECLARATIONSLIST" << endl;
-
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //TEMPORARY PRINT OUT
-    printf("Read: %s ", newToken->GetString());
-	printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-    while (newToken->GetType() != TokenType::VAR &&
-           newToken->GetType() != TokenType::LeftBRACE)
+    while (tokens->GetToken(*tokenCounter)->GetType() != TokenType::VAR &&
+           tokens->GetToken(*tokenCounter)->GetType() != TokenType::LeftBRACE)
     {
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         TypeDeclaration(tokenCounter, tokens);
     }
-
-    //TEMPORARY PRINT OUT
-    cout << "EXITED TYPEDECLARATIONSLIST" << endl;
 }
 
 //UNSURE: typeDeclaration → idList COLON typeName SEMICOLON
 void Parser::TypeDeclaration(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-
     //idList
-    //ORIGINALLY WAS: IDList(tokenCounter, tokens);
     vector<Token*>* returnIDs = IDList(tokenCounter, tokens);
 
     //COLON
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //printf("Read: %s ", newToken->GetString());
-	//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-
-    if(newToken->GetType() == TokenType::COLON)
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::COLON)
     {
         (*tokenCounter)++;
 
         //TpeName
         TypeName(tokenCounter, tokens);
 
-        //SEMICOLON
-        newToken = tokens->GetToken(*tokenCounter);
-        if(newToken->GetType() == TokenType::SEMICOLON)
+        for(int i = 0; i < returnIDs->size();i++)
         {
-            printf("Read: %s ", newToken->GetString());
-		    printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
+            TypeDescriptor *test = new TypeDescriptor();
+            test->typeName = (*returnIDs)[i];
+            test->type = tokens->GetToken(*tokenCounter-1);
+            typeDescriptors.push_back(test);
+        }
+
+        //SEMICOLON
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
+        {
+            //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
             (*tokenCounter)++;
         }
     }
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED TYPEDECLARATION" << endl;
 }
 //typeName → BOOLEAN | INT | LONG | REAL | STRING | ID
 void Parser::TypeName(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED TYPENAME" << endl;
-
     Token* newToken = tokens->GetToken(*tokenCounter);
     if(newToken->GetType() == TokenType::BOOLEAN
         || newToken->GetType() == TokenType::INT
@@ -136,31 +114,16 @@ void Parser::TypeName(int* tokenCounter, TokenList* tokens)
         || newToken->GetType() == TokenType::STRING
         || newToken->GetType() == TokenType::ID)
     {
-
-        //TEMPORARY: PRINT OUT
-        printf("Read: %s ", newToken->GetString());
-		printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         (*tokenCounter)++;
     }
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED TYPENAME" << endl;
 }
 //CONFIDENT: variableDeclarations → VAR variableDeclarationList | EPSILON
 void Parser::VariableDeclarations(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED VARIABLEDECLARATIONS" << endl;
-
     //VAR
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //TEMPORARY: PRINT OUT
-    printf("Read: %s ", newToken->GetString());
-	printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-    if(newToken->GetType() == TokenType::VAR)
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::VAR)
     {
         (*tokenCounter)++;
 
@@ -168,157 +131,468 @@ void Parser::VariableDeclarations(int* tokenCounter, TokenList* tokens)
         VariableDeclarationList(tokenCounter, tokens);
     }
     else
-        cout << "NOT OF TYPE: VAR" << endl;
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED VARIABLEDECLARATIONS" << endl;
+        cout << "OF" << endl;
 }
 
 //variableDeclarationList → variableDeclaration { variableDeclaration }
 void Parser::VariableDeclarationList(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED VARIABLEDECLARATIONLIST" << endl;
-
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //TEMPORARY: PRINT OUT
-    printf("Read: %s ", newToken->GetString());
-	printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-    while (newToken->GetType() != TokenType::LeftBRACE)
+    while (tokens->GetToken(*tokenCounter)->GetType() != TokenType::LeftBRACE)
     {
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         VariableDeclaration(tokenCounter, tokens);
     }
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED VARIABLEDECLARATIONLIST" << endl;
 }
 
 //CONFIDENT: variableDeclaration → idList COLON typeName SEMICOLON
 void Parser::VariableDeclaration(int* tokenCounter, TokenList* tokens)
 {
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED VARIABLEDECLARATION" << endl;
-
     //idList
-    IDList(tokenCounter, tokens);
+    vector<Token*>* returnIDs = IDList(tokenCounter, tokens);
 
     //COLON
-    Token *newToken = tokens->GetToken(*tokenCounter);
-
-    //TEMPORARY: PRINT OUT
-    //printf("Read: %s ", newToken->GetString());
-	//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-    if(newToken->GetType() == TokenType::COLON)
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::COLON)
     {
         (*tokenCounter)++;
 
         //TpeName
         TypeName(tokenCounter, tokens);
 
+        for(int i = 0; i < returnIDs->size();i++)
+        {
+            VariableDescriptor *test = new VariableDescriptor();
+            test->variableName = (*returnIDs)[i];
+            test->type = tokens->GetToken(*tokenCounter-1);
+            variableDescriptors.push_back(test);
+        }
+
+
         //SEMICOLON
-        Token *newToken = tokens->GetToken(*tokenCounter);
-
-        //TEMPORARY: PRINT OUT
-        //printf("Read: %s ", newToken->GetString());
-		//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
-        if(newToken->GetType() == TokenType::SEMICOLON)
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
         {
             (*tokenCounter)++;
         }
-    }
+        else
+        {
+                    cout << ":" << endl;
 
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED VARIABLEDECLARATION" << endl;
+            exit(1);
+        }
+    }
+    else
+    {
+                cout << "E" << endl;
+
+        exit(1);
+    }
 }
 
 //UNSUREL idList → ID { COMMA ID }
 vector<Token*>* Parser::IDList(int* tokenCounter, TokenList* tokens)
-{
-    //TEMPORARY PRINT OUT
-    //cout << "ENTERED IDLIST" << endl;
-    
+{    
     vector<Token*>* resultTokens = new vector<Token*>();
     Token *newToken = tokens->GetToken(*tokenCounter);
 
-    //TEMPORARY: PRINT OUT
-    printf("Read: %s ", newToken->GetString());
-	printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
-
     while (newToken->GetType() == TokenType::ID || newToken->GetType() == TokenType::COMMA)
     {
-        if(newToken->GetType() != TokenType::COMMA)
+        if(tokens->GetToken(*tokenCounter)->GetType() != TokenType::COMMA)
         {
-            resultTokens->push_back(newToken);
+            resultTokens->push_back(tokens->GetToken(*tokenCounter));
         }
 
         (*tokenCounter)++;
         newToken = tokens->GetToken(*tokenCounter);
-
-        //TEMPORARY: PRINT OUT
-        //printf("Read: %s ", newToken->GetString());
-		//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newToken->GetType())));
     }
-
-    //TEMPORARY PRINT OUT
-    //cout << "EXITED IDLIST" << endl;
 
     return resultTokens;
 }
 
-//typeName → BOOLEAN | INT | LONG | REAL | STRING | ID
-// bool Parser::TypeName(const char* token)
-// {
-//     return (strcmp(token, "BOOLEAN") == 0
-//             || strcmp(token, "INT") == 0
-//             || strcmp(token, "LONG") == 0
-//             || strcmp(token, "REAL") == 0
-//             || strcmp(token, "STRING") == 0
-//             || strcmp(token, "ID") == 0);
-// }
+//body → LeftBRACE statementList RightBRACE
+void Parser::ParseBody(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Parse Body\n");
 
-//BUILDING BLOCKS
+    //LeftBRACE
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::LeftBRACE)
+    {
+        (*tokenCounter)++;
+
+        //StatementList
+        StatementList(tokenCounter, tokens);
+
+        //RightBrace
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::RightBRACE)
+        {
+            (*tokenCounter)++;
+        }
+    }
+	//printf("Exited Parse Body\n");
+}
+
+
+//statementList → statement { statement }
+void Parser::StatementList(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Statement List\n");
+
+    //RightBracket
+    while (tokens->GetToken(*tokenCounter)->GetType() != TokenType::RightBRACE)
+    {
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        Statement(tokenCounter, tokens);
+    }
+
+    //printf("Exited Statement List\n");
+}
+
+//statement → whileStatement | assignStatement | doStatement
+void Parser::Statement(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Statement\n");
+
+    //While Statement
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::WHILE)
+    {
+        WhileStatement(tokenCounter, tokens);
+    }
+
+    //Assign Statement
+    else if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::ID)
+    {
+        AssignStatement(tokenCounter, tokens);
+    }
+
+    //Do Statement
+    else if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::DO)
+    {
+        DoStatement(tokenCounter, tokens);
+    }
+    else
+    {
+
+    }
+    //printf("Exited Statement\n");
+}
+
+//whileStatement → WHILE conditional body
+void Parser::WhileStatement(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered While Statement\n");
+
+    //WHILE
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::WHILE)
+    {
+        (*tokenCounter)++;
+
+        //Condittional
+        Conditional(tokenCounter, tokens);
+
+        //Body
+        ParseBody(tokenCounter, tokens);
+    }
+
+    //printf("Exited While Statement\n");
+}
+
+//assignStatement → ID EQUAL expression SEMICOLON
+void Parser::AssignStatement(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Assign Statement\n");
+
+    //ID
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::ID)
+    {
+        (*tokenCounter)++;
+
+        //EQUAL
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::EQUAL)
+        {
+            (*tokenCounter)++;
+
+            //Expression
+            Expression(tokenCounter, tokens);
+
+            //SEMICOLON
+            //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+            if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
+            {
+                (*tokenCounter)++;
+            }
+        }
+    }
+
+    //printf("Exited Assign Statement\n");
+}
+
+//doStatement → DO body WHILE conditional SEMICOLON
+void Parser::DoStatement(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Do Statement\n");
+
+    //DO
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::DO)
+    {
+        (*tokenCounter)++;
+
+        //Body
+        ParseBody(tokenCounter, tokens);
+
+        //WHILE
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::WHILE)
+        {
+            (*tokenCounter)++;
+
+            //Conditional
+            Conditional(tokenCounter, tokens);
+
+            //SEMICOLON
+            //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+            if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
+            {
+                (*tokenCounter)++;
+            }
+        }
+    }
+
+    //printf("Exited Do Statement\n");
+}
+
+//expression → term PLUS expression | term MINUS expression | term
+void Parser::Expression(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Expression\n");
+
+    //Term
+    Term(tokenCounter, tokens);
+
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::PLUS
+    || tokens->GetToken(*tokenCounter)->GetType() == TokenType::MINUS)
+    {
+        //PLUS or MINUS
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        (*tokenCounter)++;
+
+        Expression(tokenCounter, tokens);
+    }
+
+    //printf("Exited Expression\n");
+}
+
+//term → factor MULT term | factor DIV term | factor
+void Parser::Term(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Term\n");
+
+    //Factor
+    Factor(tokenCounter, tokens);
+    
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::MULT
+    || tokens->GetToken(*tokenCounter)->GetType() == TokenType::DIV)
+    {
+        //MULT or DIV
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        (*tokenCounter)++;
+
+        Term(tokenCounter, tokens);
+    }
+
+    //printf("Exited Term\n");
+}
+
+//factor → LeftPAREN expression RightPAREN | ID | NUM | RealNUM
+void Parser::Factor(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Factor\n");
+
+    //LeftPAREN
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::LeftPAREN)
+    {
+        (*tokenCounter)++;
+
+        Expression(tokenCounter, tokens);
+
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::RightPAREN)
+        {
+            (*tokenCounter)++;
+        }
+    }
+    else if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::ID
+         || tokens->GetToken(*tokenCounter)->GetType() == TokenType::NUM
+         || tokens->GetToken(*tokenCounter)->GetType() == TokenType::RealNUM)
+    {
+        (*tokenCounter)++;
+    }
+
+    //printf("Exited Factor\n");
+}
+
 //conditional → ID | primary relationalOperator primary
-// bool Parser::Conditional(const char* token)
+void Parser::Conditional(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Conditional\n");
+
+    //ID
+    //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+    if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::COLON)
+    {
+        (*tokenCounter)++;
+    }
+    else
+    {
+        //Primary
+        Primary(tokenCounter, tokens);
+
+        //RelationalOperator
+        RelationalOperator(tokenCounter, tokens);
+
+        //Primary
+        Primary(tokenCounter, tokens);
+    }
+
+    //printf("Exited Conditional\n");
+}
+
+//primary → ID | NUM | RealNUM
+void Parser::Primary(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Primary\n");
+
+    Token* newToken = tokens->GetToken(*tokenCounter);
+    if(newToken->GetType() == TokenType::ID
+        || newToken->GetType() == TokenType::NUM
+        || newToken->GetType() == TokenType::RealNUM)
+    {
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        (*tokenCounter)++;
+    }
+
+    //printf("Exited Primary\n");
+}
+
+//relationalOperator → EQUAL | NotEQUAL | GREATER | GTEQ | LESS | LTEQ
+void Parser::RelationalOperator(int* tokenCounter, TokenList* tokens)
+{
+    //printf("Entered Relational Operator\n");
+
+    Token* newToken = tokens->GetToken(*tokenCounter);
+    if(newToken->GetType() == TokenType::EQUAL
+        || newToken->GetType() == TokenType::NotEQUAL
+        || newToken->GetType() == TokenType::GREATER
+        || newToken->GetType() == TokenType::GtEQ
+        || newToken->GetType() == TokenType::LESS
+        || newToken->GetType() == TokenType::LtEQ)
+    {
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        (*tokenCounter)++;
+    }
+
+    //printf("Exited Relational Operator\n");
+}
+
+void Parser::PrintTypeDeclarations()
+{
+    //printf("Entered PrintTypeDeclarations\n");
+    for(int i = 0; i < typeDescriptors.size(); i++)
+    {
+        TypeDescriptor *typeDescriptor = typeDescriptors[i];
+        printf("Type Name: %s\tType Type: %s\n", typeDescriptor->typeName->GetString(), typeDescriptor->type->GetString());
+        //printf("Type Name: %s\n", typeDescriptor->typeName->GetString());
+    }
+    //printf("Exited PrintTypeDeclarations\n");
+}
+
+void Parser::PrintVariableDeclarations()
+{
+    //printf("Entered PrintVariableDeclarations\n");
+    for(int i = 0; i < variableDescriptors.size(); i++)
+    {
+        VariableDescriptor *variableDescriptor = variableDescriptors[i];
+        //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
+        printf("Variable Name: %s\tVariable Type: %s\n", variableDescriptor->variableName->GetString(), variableDescriptor->type->GetString());
+    }
+    //printf("Exited PrintTypeDeclarations\n");
+}
+
+void Parser::ListAllPresentTypes()
+{
+    //printf("Entered List All Present Types\n");
+
+    // for(int i = 0; i < returnIDs->size();i++)
+    // {
+    //     VariableDescriptor *test = new VariableDescriptor();
+    //     test->variableName = (*returnIDs)[i];
+    //     test->type = tokens->GetToken(*tokenCounter-1);
+    //     variableDescriptors.push_back(test);
+    // }
+
+    //vector<TypeDescriptor*> typeDescriptors;
+    //vector<VariableDescriptor*> variableDescriptors;
+
+    //for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
+    //{
+    //    printf("Variable Name: %s\n", it->typeName->GetString());
+    //}
+	// for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
+    // {
+    //     CheckType((*it)->type->GetType());
+    // }
+        //if()
+     //   printf("Variable Name: %s\tVariable Type: %s\n", it->variableName->GetString(), it->type->GetString());
+        //it->
+        //if()
+    //for(vector<int>::iterator it = variableDescriptors.begin(); it != variableDescriptors.end(), it++)
+    //{
+
+    //}
+
+    //printf("BOOLEAN # \nINT #\nLONG #\nREAL #\nSTRING #\n");
+    for(TokenType t = TokenType::BOOLEAN; t <= TokenType::STRING; ((int)t)++)
+    {
+
+    }
+}
+
+// vector<Token*> Parser:CheckType(TokenType tokenType)
 // {
-//     if(strcmp(token, "ID") == 0)
+//     if(tokenType == TokenType::INT)
 //     {
-//         return true;
+//         intTokens->push_back(tokenType);
 //     }
-//     else if((Primary(token) && RelationalOperator(token) && Primary(token)))
+//     else if(tokenType == TokenType::BOOLEAN)
 //     {
-//         return true;
+
 //     }
 //     else
 //     {
-//         return false;
+//         CheckType();
 //     }
-// }
-
-// //relationalOperator → EQUAL | NotEQUAL | GREATER | GTEQ | LESS | LTEQ
-// bool Parser::RelationalOperator(const char* token)
-// {
-//     return (strcmp(token, "EQUAL") == 0
-//             || strcmp(token, "NotEQUAL") == 0
-//             || strcmp(token, "GREATER") == 0
-//             || strcmp(token, "GTEQ") == 0
-//             || strcmp(token, "LESS") == 0
-//             || strcmp(token, "LTEQ") == 0);
-// }
-
-// //primary → ID | NUM | RealNUM
-// bool Parser::Primary(const char* token)
-// {
-//     return (strcmp(token, "ID") == 0
-//             || strcmp(token, "NUM") == 0
-//             || strcmp(token, "RealNUM") == 0);
+//     return 
 // }
 
 
-// Token* GetNextToken()
-// {
-// 	return tokenList->GetToken(tokenCounter++);
-// }
+void Parser::CheckDuplicateErrors()
+{
+// 1. Explicit type redeclared explicitly - A type is declared explicitly twice.
+// 2. Implicit type redeclared explicitly - A type is declared explicitly after being declared
+// implicitly.
+// 3. Programmer-defined type redeclared as variable - A name is declared as both a type and a
+// variable.
+// 4. Programmer-defined type used as variable - A name is declared as a type, then used as a
+// variable.
+// 5. Variable declared more than once - A variable is declared twice.
+// 6. Variable used as a type - A variable is used as a type in a variable declaration.
+// Note that implicit declarations can not occur after an explicit declaration, as this would be a use,
+// not a declaration. Also, if one of the built-in types is redeclared as a type, declared as a variable,
+
+}
+

@@ -30,10 +30,8 @@ void LoadProgram(char *programFileName) {
 			if(newTok != nullptr)
 			{
 				//TEMPORARY: PRINT OUT READ< TYPE< INT
-				printf("Read: %s ", newTok->GetString());
-				printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newTok->GetType())));
-
-				//printf("\t\tInt: %d\n", static_cast<int>(newTok->GetType()));
+				//printf("Read: %s ", newTok->GetString());
+				//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newTok->GetType())));
 			}
 			else
 			{
@@ -41,11 +39,9 @@ void LoadProgram(char *programFileName) {
 			}
 		}
 
-		printf("END OF TEST\n\n\n");
+		//printf("END OF TEST\n\n\n");
 		newParser->Parse(tokenList);
-
-
-		printf("Program loaded successfully.\n");
+		//printf("Program loaded successfully.\n");
 	}
 	else
 	{

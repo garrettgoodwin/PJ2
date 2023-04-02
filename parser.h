@@ -13,6 +13,8 @@
 #include "token.h"
 #include "tokenList.h"
 #include "tokenType.h"
+#include "typeDescriptor.h"
+#include "variableDescriptor.h"
 
 using namespace std;
 
@@ -38,6 +40,37 @@ class Parser
         void VariableDeclarationList(int* tokenCounter, TokenList* tokens);
         void VariableDeclaration(int* tokenCounter, TokenList* tokens);
         vector<Token*>* IDList(int* tokenCounter, TokenList* tokens);
+        
+        void ParseBody(int* tokenCounter, TokenList* tokens);
+        void StatementList(int* tokenCounter, TokenList* tokens);
+        void Statement(int* tokenCounter, TokenList* tokens);
+        void WhileStatement(int* tokenCounter, TokenList* tokens);
+        void AssignStatement(int* tokenCounter, TokenList* tokens);
+        void DoStatement(int* tokenCounter, TokenList* tokens);
+        void Expression(int* tokenCounter, TokenList* tokens);
+        void Term(int* tokenCounter, TokenList* tokens);
+        void Factor(int* tokenCounter, TokenList* tokens);
+        void Conditional(int* tokenCounter, TokenList* tokens);
+        void Primary(int* tokenCounter, TokenList* tokens);
+        void RelationalOperator(int* tokenCounter, TokenList* tokens);
+
+        //Newer Funcitons
+        void PrintTypeDeclarations();
+        void PrintVariableDeclarations();
+
+        void CheckDuplicateErrors();
+
+        void ListAllPresentTypes();
+
+
+
+        vector<TypeDescriptor*> typeDescriptors;
+        vector<VariableDescriptor*> variableDescriptors;
+
+        vector<Token*> intTokens;
+
+
+
 
 
         //declarations → typeDeclarations variableDeclarations
