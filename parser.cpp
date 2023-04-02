@@ -41,7 +41,7 @@ void Parser::Declarations(int* tokenCounter, TokenList* tokens)
     //Comment When Submitting
     //PrintVariableDeclarations();
 
-    //CheckDuplicateErrors();
+    CheckDuplicateErrors();
 }
 
 //CONFIDENT: typeDeclarations → TYPE typeDeclarationList | EPSILON
@@ -585,9 +585,9 @@ void Parser::ListAllPresentTypes()
 
     vector<Token*> stringTypes = GetNamedTokens(TokenType::STRING);
     printf("STRING");
-    for(int i = 0; i < realTypes.size(); i++)
+    for(int i = 0; i < stringTypes.size(); i++)
     {
-        printf(" %s", realTypes[i]->GetString());
+        printf(" %s", stringTypes[i]->GetString());
     }
     printf(" #\n");
 }
@@ -612,46 +612,64 @@ void Parser::ListAllPresentTypes()
 
 void Parser::CheckDuplicateErrors()
 {
-
-
 // 1. Explicit type redeclared explicitly - A type is declared explicitly twice.
-// 2. Implicit type redeclared explicitly - A type is declared explicitly after being declared
-// implicitly.
-// 3. Programmer-defined type redeclared as variable - A name is declared as both a type and a
-// variable.
-	for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
     {
-	    for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+	    for(vector<TypeDescriptor*>::iterator it_2 = it_1 + 1; it_2 != typeDescriptors.end(); it_2++)
         {
-            if ((*it_1)->typeName->GetType() == (*it_2)->variableName->GetType())
+            //printf("Check %s with %s and got a ", (*it_1)->typeName->GetString(), (*it_2)->typeName->GetString());
+            //Originally was if(*it_1)->typeName->GetType() == (*it_2)->typeName->GetType())
+            if (strcmp((*it_1)->typeName->GetString(), (*it_2)->typeName->GetString()) == 0)
             {
-                printf("DUPLICATION ERROR 3 %s", (*it_1)->typeName->GetString());
-                //exit(1);
+                printf("DUPLICATION ERROR 1 %s", (*it_1)->typeName->GetString());
+                exit(1);
             }
         }
     }
-// 4. Programmer-defined type used as variable - A name is declared as a type, then used as a
+// 2. Implicit type redeclared explicitly - A type is declared explicitly after being declared
+// implicitly.
+// 3. Programmer-defined type redeclared as variable - A name is declared as both a type and a
 // variable.
 	// for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
     // {
 	//     for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
     //     {
-    //         if ((*it_1)->typeName->GetType() == (*it_2)->type->GetType())
+    //         if ((*it_1)->typeName->GetType() == (*it_2)->variableName->GetType())
+    //         {
+    //             printf("DUPLICATION ERROR 3 %s", (*it_1)->typeName->GetString());
+    //             exit(1);
+    //         }
+    //     }
+    // }
+// 4. Programmer-defined type used as variable - A name is declared as a type, then used as a
+// variable.
+
+//DOES NOT WORK
+	// for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    // {
+	//     for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+    //     {
+
+    //         printf("Check %s with %s and got a \n", (*it_1)->typeName->GetString(), (*it_2)->type->GetString());
+    //         //if ((*it_1)->typeName->GetType() == (*it_2)->type->GetType())
+    //         if (strcmp((*it_1)->typeName->GetString(), (*it_2)->type->GetString()) == 0)
     //         {
     //             printf("DUPLICATION ERROR 4 %s", (*it_1)->typeName->GetString());
-    //             //exit(1);
+    //             exit(1);
     //         }
     //     }
     // }
 // 5. Variable declared more than once - A variable is declared twice.
-	for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+	for(vector<VariableDescriptor*>::iterator it_1 = variableDescriptors.begin(); it_1 != variableDescriptors.end(); it_1++)
     {
-	    for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+	    for(vector<VariableDescriptor*>::iterator it_2 = it_1 + 1; it_2 != variableDescriptors.end(); it_2++)
         {
-            if ((*it_1)->typeName->GetType() == (*it_2)->type->GetType())
+            //printf("Check %s with %s\n", (*it_1)->variableName->GetString(), (*it_2)->variableName->GetString());
+            //if ((*it_1)->variableName->GetType() == (*it_2)->variableName->GetType())
+            if (strcmp((*it_1)->variableName->GetString(), (*it_2)->variableName->GetString()) == 0)
             {
-                printf("DUPLICATION ERROR 4 %s", (*it_1)->typeName->GetString());
-                //exit(1);
+                printf("DUPLICATION ERROR 5 %s", (*it_1)->variableName->GetString());
+                exit(1);
             }
         }
     }
