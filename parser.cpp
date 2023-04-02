@@ -525,41 +525,22 @@ void Parser::PrintVariableDeclarations()
 
 void Parser::ListAllPresentTypes()
 {
-    //printf("Entered List All Present Types\n");
+    printf("Entered List All Present Types\n");
 
-    // for(int i = 0; i < returnIDs->size();i++)
-    // {
-    //     VariableDescriptor *test = new VariableDescriptor();
-    //     test->variableName = (*returnIDs)[i];
-    //     test->type = tokens->GetToken(*tokenCounter-1);
-    //     variableDescriptors.push_back(test);
-    // }
+	for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
+    {
+        //CheckType((*it)->type->GetType());
 
-    //vector<TypeDescriptor*> typeDescriptors;
-    //vector<VariableDescriptor*> variableDescriptors;
-
-    //for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
-    //{
-    //    printf("Variable Name: %s\n", it->typeName->GetString());
-    //}
-	// for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
-    // {
-    //     CheckType((*it)->type->GetType());
-    // }
-        //if()
-     //   printf("Variable Name: %s\tVariable Type: %s\n", it->variableName->GetString(), it->type->GetString());
-        //it->
-        //if()
-    //for(vector<int>::iterator it = variableDescriptors.begin(); it != variableDescriptors.end(), it++)
-    //{
-
-    //}
+        // {
+    if((*it)->type->GetType() == TokenType::INT)
+    {
+        printf("%s",(*it)->typeName->GetString());
+    }
+    else if((*it)->type->GetType() == TokenType::BOOLEAN)
+    {
+    }
 
     //printf("BOOLEAN # \nINT #\nLONG #\nREAL #\nSTRING #\n");
-    for(TokenType t = TokenType::BOOLEAN; t <= TokenType::STRING; ((int)t)++)
-    {
-
-    }
 }
 
 // vector<Token*> Parser:CheckType(TokenType tokenType)
@@ -578,6 +559,7 @@ void Parser::ListAllPresentTypes()
 //     }
 //     return 
 // }
+}
 
 
 void Parser::CheckDuplicateErrors()
