@@ -1,0 +1,9 @@
+TYPE
+    type1 : STRING;
+VAR
+    var1 : STRING;
+    var1 : type1;
+    var2 : STRING;
+{
+    var2 = var3;
+}

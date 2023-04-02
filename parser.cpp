@@ -30,16 +30,18 @@ void Parser::Declarations(int* tokenCounter, TokenList* tokens)
     //Type Declarations
     TypeDeclarations(tokenCounter, tokens);
 
-    //Test
-    PrintTypeDeclarations();
+    //Comment When Submitting
+    //PrintTypeDeclarations();
 
     //PrintStatementLists
 
     //Varaible Declarations
     VariableDeclarations(tokenCounter, tokens);
 
-    //Test
-    PrintVariableDeclarations();
+    //Comment When Submitting
+    //PrintVariableDeclarations();
+
+    //CheckDuplicateErrors();
 }
 
 //CONFIDENT: typeDeclarations → TYPE typeDeclarationList | EPSILON
@@ -57,7 +59,7 @@ void Parser::TypeDeclarations(int* tokenCounter, TokenList* tokens)
     else
     {
         //Not Sure if I should exit here
-        cout << "NOT  " << endl;
+        printf("SYNTAX ERROR");
         exit(1);
     }
 }
@@ -101,6 +103,16 @@ void Parser::TypeDeclaration(int* tokenCounter, TokenList* tokens)
             //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
             (*tokenCounter)++;
         }
+        else
+        {
+            printf("SYNTAX ERROR");
+            exit(1);
+        }
+    }
+    else
+    {
+        printf("SYNTAX ERROR");
+        exit(1);
     }
 }
 //typeName → BOOLEAN | INT | LONG | REAL | STRING | ID
@@ -117,6 +129,11 @@ void Parser::TypeName(int* tokenCounter, TokenList* tokens)
         //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         (*tokenCounter)++;
     }
+    else
+    {
+        printf("SYNTAX ERROR");
+        exit(1);
+    }
 }
 //CONFIDENT: variableDeclarations → VAR variableDeclarationList | EPSILON
 void Parser::VariableDeclarations(int* tokenCounter, TokenList* tokens)
@@ -131,7 +148,10 @@ void Parser::VariableDeclarations(int* tokenCounter, TokenList* tokens)
         VariableDeclarationList(tokenCounter, tokens);
     }
     else
-        cout << "OF" << endl;
+    {
+        printf("SYNTAX ERROR");
+        exit(1);
+    }
 }
 
 //variableDeclarationList → variableDeclaration { variableDeclaration }
@@ -167,7 +187,6 @@ void Parser::VariableDeclaration(int* tokenCounter, TokenList* tokens)
             variableDescriptors.push_back(test);
         }
 
-
         //SEMICOLON
         if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
         {
@@ -175,15 +194,13 @@ void Parser::VariableDeclaration(int* tokenCounter, TokenList* tokens)
         }
         else
         {
-                    cout << ":" << endl;
-
+            printf("SYNTAX ERROR");
             exit(1);
         }
     }
     else
     {
-                cout << "E" << endl;
-
+        printf("SYNTAX ERROR");
         exit(1);
     }
 }
@@ -227,6 +244,11 @@ void Parser::ParseBody(int* tokenCounter, TokenList* tokens)
         if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::RightBRACE)
         {
             (*tokenCounter)++;
+        }
+        else
+        {
+            printf("SYNTAX ERROR");
+            exit(1);
         }
     }
 	//printf("Exited Parse Body\n");
@@ -272,7 +294,9 @@ void Parser::Statement(int* tokenCounter, TokenList* tokens)
     }
     else
     {
-
+        //Not sure if this should go here
+        printf("SYNTAX ERROR");
+        exit(1);
     }
     //printf("Exited Statement\n");
 }
@@ -525,22 +549,47 @@ void Parser::PrintVariableDeclarations()
 
 void Parser::ListAllPresentTypes()
 {
-    printf("Entered List All Present Types\n");
+    //printf("Entered List All Present Types\n");
 
-	for(vector<TypeDescriptor*>::iterator it = typeDescriptors.begin(); it != typeDescriptors.end(); it++)
+    vector<Token*> boolTypes = GetNamedTokens(TokenType::BOOLEAN);
+    printf("BOOLEAN");
+    for(int i = 0; i < boolTypes.size(); i++)
     {
-        //CheckType((*it)->type->GetType());
-
-        // {
-    if((*it)->type->GetType() == TokenType::INT)
-    {
-        printf("%s",(*it)->typeName->GetString());
+        printf(" %s", boolTypes[i]->GetString());
     }
-    else if((*it)->type->GetType() == TokenType::BOOLEAN)
-    {
-    }
+    printf(" #\n");
 
-    //printf("BOOLEAN # \nINT #\nLONG #\nREAL #\nSTRING #\n");
+    vector<Token*> intTypes = GetNamedTokens(TokenType::INT);
+    printf("INT");
+    for(int i = 0; i < intTypes.size(); i++)
+    {
+        printf(" %s", intTypes[i]->GetString());
+    }
+    printf(" #\n");
+
+    vector<Token*> longTypes = GetNamedTokens(TokenType::LONG);
+    printf("LONG");
+    for(int i = 0; i < longTypes.size(); i++)
+    {
+        printf(" %s", longTypes[i]->GetString());
+    }
+    printf(" #\n");
+
+    vector<Token*> realTypes = GetNamedTokens(TokenType::REAL);
+    printf("REAL");
+    for(int i = 0; i < realTypes.size(); i++)
+    {
+        printf(" %s", realTypes[i]->GetString());
+    }
+    printf(" #\n");
+
+    vector<Token*> stringTypes = GetNamedTokens(TokenType::STRING);
+    printf("STRING");
+    for(int i = 0; i < realTypes.size(); i++)
+    {
+        printf(" %s", realTypes[i]->GetString());
+    }
+    printf(" #\n");
 }
 
 // vector<Token*> Parser:CheckType(TokenType tokenType)
@@ -559,22 +608,128 @@ void Parser::ListAllPresentTypes()
 //     }
 //     return 
 // }
-}
 
 
 void Parser::CheckDuplicateErrors()
 {
+
+
 // 1. Explicit type redeclared explicitly - A type is declared explicitly twice.
 // 2. Implicit type redeclared explicitly - A type is declared explicitly after being declared
 // implicitly.
 // 3. Programmer-defined type redeclared as variable - A name is declared as both a type and a
 // variable.
+	for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    {
+	    for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+        {
+            if ((*it_1)->typeName->GetType() == (*it_2)->variableName->GetType())
+            {
+                printf("DUPLICATION ERROR 3 %s", (*it_1)->typeName->GetString());
+                //exit(1);
+            }
+        }
+    }
 // 4. Programmer-defined type used as variable - A name is declared as a type, then used as a
 // variable.
+	// for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    // {
+	//     for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+    //     {
+    //         if ((*it_1)->typeName->GetType() == (*it_2)->type->GetType())
+    //         {
+    //             printf("DUPLICATION ERROR 4 %s", (*it_1)->typeName->GetString());
+    //             //exit(1);
+    //         }
+    //     }
+    // }
 // 5. Variable declared more than once - A variable is declared twice.
+	for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    {
+	    for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+        {
+            if ((*it_1)->typeName->GetType() == (*it_2)->type->GetType())
+            {
+                printf("DUPLICATION ERROR 4 %s", (*it_1)->typeName->GetString());
+                //exit(1);
+            }
+        }
+    }
 // 6. Variable used as a type - A variable is used as a type in a variable declaration.
 // Note that implicit declarations can not occur after an explicit declaration, as this would be a use,
 // not a declaration. Also, if one of the built-in types is redeclared as a type, declared as a variable,
-
 }
+
+void Parser::CheckTypeMismatch()
+{
+// 1.	The left side of an assignment must have the same type as the right side.
+// 2.	The operands of an operation (PLUS, MINUS, MULT, DIV) must have the same type.  This may be any type, including programmer-defined types.
+// 3.	The operands of a relational operator must have the same type.  This may be any type, including programmer-defined types.
+// 4.	A conditional must be of type BOOLEAN.
+}
+
+vector<Token*> Parser::GetNamedTokens(TokenType type)
+{
+    vector<Token*> namedTokens;
+    for(int i = 0; i < typeDescriptors.size(); i++)
+    {
+        if(GetType(typeDescriptors[i]) == type)
+        {
+            namedTokens.push_back(typeDescriptors[i]->typeName);
+        }
+    }
+
+    for(int j = 0; j < variableDescriptors.size(); j++)
+    {
+        if(GetType(variableDescriptors[j]) == type)
+        {
+            namedTokens.push_back(variableDescriptors[j]->variableName);
+        }
+    }
+
+    return namedTokens;
+}
+
+TokenType Parser::GetType(TypeDescriptor* typeDescriptor)
+{
+    //Base Case
+    if(typeDescriptor->type->GetType() != TokenType::ID)
+    {
+        return typeDescriptor->type->GetType();
+    }
+
+    // so we have an ID so we need to find that in the type descriptors list
+    for(int i = 0; i < typeDescriptors.size(); i++)
+    {
+        if(strcmp(typeDescriptors[i]->typeName->GetString(),typeDescriptor->type->GetString())==0)
+        {
+            return GetType(typeDescriptors[i]);
+        }
+    }
+    return TokenType::INVALID;
+}
+
+TokenType Parser::GetType(VariableDescriptor* variableDescriptor)
+{
+    if(variableDescriptor->type->GetType() != TokenType::ID)
+    {
+       return variableDescriptor->type->GetType();
+    }
+
+    // so we have an ID so we need to find that in the type descriptors list
+    for(int i = 0; i < typeDescriptors.size(); i++)
+    {
+        if(strcmp(typeDescriptors[i]->typeName->GetString(),variableDescriptor->type->GetString())==0)
+        {
+            return GetType(typeDescriptors[i]);
+        }
+    }
+    return TokenType::INVALID;
+}
+
+
+
+
+
+
 

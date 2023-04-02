@@ -11,6 +11,7 @@
 #include "program2.h"
 #include "programFile.h"
 
+using namespace std;
 
 // Loads the program.
 void LoadProgram(char *programFileName) {
@@ -27,25 +28,16 @@ void LoadProgram(char *programFileName) {
 		{
 			Token* newTok =  tokenList->GetToken(i);
 
-			if(newTok != nullptr)
-			{
-				//TEMPORARY: PRINT OUT READ< TYPE< INT
-				//printf("Read: %s ", newTok->GetString());
-				//printf("\t\tType: %s\n", TokenTypeToString(static_cast<int>(newTok->GetType())));
-			}
-			else
-			{
-				//std::cout << "Null token pointer" << std::endl;
-			}
+			// if(newTok == nullptr)
+			// {
+			// 	printf("TOKENIZER ERROR");
+			// }
 		}
-
-		//printf("END OF TEST\n\n\n");
 		newParser->Parse(tokenList);
-		//printf("Program loaded successfully.\n");
 	}
 	else
 	{
 		//Tokenizer Error
-		std::cout << "TOKENIZER ERROR";
+		printf("TOKENIZER ERROR");
 	}
 }

@@ -7,7 +7,8 @@
 int main(int argc, char** argv)
 {
 	// Load the program.
-	LoadProgram("Sample Program.txt");
+	//LoadProgram("Sample Program.txt");
+	LoadProgram("example4.txt");
 
 	exit(0);
 }

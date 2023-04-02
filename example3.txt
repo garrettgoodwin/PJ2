@@ -1,0 +1,8 @@
+TYPE
+    type1 : REAL;
+VAR
+    type1 : REAL;
+    var1 : REAL;
+{
+    var1 = 15.4;
+}

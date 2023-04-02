@@ -59,18 +59,19 @@ class Parser
         void PrintVariableDeclarations();
 
         void CheckDuplicateErrors();
+        void CheckTypeMismatch();
 
         void ListAllPresentTypes();
 
-
+        vector<Token*> GetNamedTokens(TokenType type);
+        
+        TokenType GetType(TypeDescriptor* typeDescriptor);
+        TokenType GetType(VariableDescriptor* variableDescriptor);
 
         vector<TypeDescriptor*> typeDescriptors;
         vector<VariableDescriptor*> variableDescriptors;
 
         vector<Token*> intTokens;
-
-
-
 
 
         //declarations → typeDeclarations variableDeclarations
