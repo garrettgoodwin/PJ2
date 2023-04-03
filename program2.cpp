@@ -15,6 +15,9 @@ using namespace std;
 
 // Loads the program.
 void LoadProgram(char *programFileName) {
+
+	//printf("Entered Load Program\n");
+
 	ProgramFile program;	// Current program
 	TokenList *tokenList;	// List of tokens
 	Parser *newParser = new Parser();	//Parser Object
@@ -24,16 +27,19 @@ void LoadProgram(char *programFileName) {
 	//TEMPORARY: PRINT OUT THE TOKENS
 	if(tokenList != nullptr)
 	{
-		for(int i = 0; i < tokenList->GetNumberOfTokens(); i++)
+		if (tokenList->GetNumberOfTokens() != 0)
 		{
-			Token* newTok =  tokenList->GetToken(i);
-
-			// if(newTok == nullptr)
-			// {
-			// 	printf("TOKENIZER ERROR");
-			// }
+			for (int i = 0; i < tokenList->GetNumberOfTokens(); i++)
+			{
+				Token *newTok = tokenList->GetToken(i);
+			}
+			newParser->Parse(tokenList);
 		}
-		newParser->Parse(tokenList);
+		else
+		{
+			printf("SYNTAX ERROR");
+			exit(1);
+		}
 	}
 	else
 	{

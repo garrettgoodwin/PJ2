@@ -1,7 +1,3 @@
-TYPE
-    type1 : BOOLEAN;
-VAR
-    var1 : BOOLEAN;
 {
-    var1 = type1;
+    var1 = 11;
 }
