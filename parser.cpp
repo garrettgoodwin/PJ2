@@ -439,7 +439,22 @@ void Parser::AssignStatement(int* tokenCounter, TokenList* tokens)
             (*tokenCounter)++;
 
             //Expression
-            Expression(tokenCounter, tokens);
+            TokenType expressionType = Expression(tokenCounter, tokens);
+
+            if(undefinedType)
+            {
+                VariableDescriptor* d = new VariableDescriptor();
+                d->variableName = t;
+                if(expressionType == TokenType::NUM)
+                {
+                   d->type = new Token(TokenType::INT,t->GetLineNumber());
+                }
+                else
+                {
+                  d->type = new Token(TokenType::REAL,t->GetLineNumber());
+                }
+                variableDescriptors.push_back(d);
+            }
 
             //SEMICOLON
             //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
@@ -505,7 +520,7 @@ TokenType Parser::Expression(int* tokenCounter, TokenList* tokens)
     //printf("Entered Expression\n");
     
     //Term
-    Term(tokenCounter, tokens);
+    expressionType = Term(tokenCounter, tokens);
 
     if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::PLUS
     || tokens->GetToken(*tokenCounter)->GetType() == TokenType::MINUS)
@@ -522,12 +537,13 @@ TokenType Parser::Expression(int* tokenCounter, TokenList* tokens)
 }
 
 //term → factor MULT term | factor DIV term | factor
-void Parser::Term(int* tokenCounter, TokenList* tokens)
+TokenType Parser::Term(int* tokenCounter, TokenList* tokens)
 {
+    TokenType termType = TokenType::INVALID;
     //printf("Entered Term\n");
 
     //Factor
-    Factor(tokenCounter, tokens);
+    termType = Factor(tokenCounter, tokens);
     
     if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::MULT
     || tokens->GetToken(*tokenCounter)->GetType() == TokenType::DIV)
@@ -540,11 +556,13 @@ void Parser::Term(int* tokenCounter, TokenList* tokens)
     }
 
     //printf("Exited Term\n");
+    return termType;
 }
 
 //factor → LeftPAREN expression RightPAREN | ID | NUM | RealNUM
-void Parser::Factor(int* tokenCounter, TokenList* tokens)
+TokenType Parser::Factor(int* tokenCounter, TokenList* tokens)
 {
+    TokenType factorType = TokenType::INVALID;
     //printf("Entered Factor\n");
 
     //LeftPAREN
@@ -565,10 +583,12 @@ void Parser::Factor(int* tokenCounter, TokenList* tokens)
          || tokens->GetToken(*tokenCounter)->GetType() == TokenType::NUM
          || tokens->GetToken(*tokenCounter)->GetType() == TokenType::RealNUM)
     {
+        factorType = tokens->GetToken(*tokenCounter)->GetType();
         (*tokenCounter)++;
     }
 
     //printf("Exited Factor\n");
+    return factorType;
 }
 
 //conditional → ID | primary relationalOperator primary

@@ -48,8 +48,8 @@ class Parser
         void AssignStatement(int* tokenCounter, TokenList* tokens);
         void DoStatement(int* tokenCounter, TokenList* tokens);
         TokenType Expression(int* tokenCounter, TokenList* tokens);
-        void Term(int* tokenCounter, TokenList* tokens);
-        void Factor(int* tokenCounter, TokenList* tokens);
+        TokenType Term(int* tokenCounter, TokenList* tokens);
+        TokenType Factor(int* tokenCounter, TokenList* tokens);
         void Conditional(int* tokenCounter, TokenList* tokens);
         Token* Primary(int* tokenCounter, TokenList* tokens);
         Token* RelationalOperator(int* tokenCounter, TokenList* tokens);
