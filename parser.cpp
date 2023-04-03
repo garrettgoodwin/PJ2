@@ -675,17 +675,18 @@ void Parser::CheckDuplicateErrors()
 // implicitly.
 // 3. Programmer-defined type redeclared as variable - A name is declared as both a type and a
 // variable.
-	// for(vector<TypeDescriptor*>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
-    // {
-	//     for(vector<VariableDescriptor*>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
-    //     {
-    //         if ((*it_1)->typeName->GetType() == (*it_2)->variableName->GetType())
-    //         {
-    //             printf("DUPLICATION ERROR 3 %s", (*it_1)->typeName->GetString());
-    //             exit(1);
-    //         }
-    //     }
-    // }
+    for (vector<TypeDescriptor *>::iterator it_1 = typeDescriptors.begin(); it_1 != typeDescriptors.end(); it_1++)
+    {
+        for (vector<VariableDescriptor *>::iterator it_2 = variableDescriptors.begin(); it_2 != variableDescriptors.end(); it_2++)
+        {
+            //if ((*it_1)->typeName->GetType() == (*it_2)->variableName->GetType())
+            if (strcmp((*it_1)->typeName->GetString(), (*it_2)->variableName->GetString()) == 0)
+            {
+                printf("DUPLICATION ERROR 3 %s", (*it_1)->typeName->GetString());
+                exit(1);
+            }
+        }
+    }
 // 4. Programmer-defined type used as variable - A name is declared as a type, then used as a
 // variable.
 
