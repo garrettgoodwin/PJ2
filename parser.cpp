@@ -412,12 +412,24 @@ void Parser::WhileStatement(int* tokenCounter, TokenList* tokens)
 //assignStatement → ID EQUAL expression SEMICOLON
 void Parser::AssignStatement(int* tokenCounter, TokenList* tokens)
 {
+    bool undefinedType =false;
     //printf("Entered Assign Statement\n");
 
     //ID
     //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
     if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::ID)
     {
+        Token* t = tokens->GetToken(*tokenCounter);
+        if(t != NULL)
+        {
+            if(t->GetType() == TokenType::ID &&
+               !VariableExists(t))
+            {
+               undefinedType = true;
+               //cout << "Using Undefined Varible " << t->GetString() << " in assignment" << endl;
+            }
+        }
+
         (*tokenCounter)++;
 
         //EQUAL
@@ -487,10 +499,11 @@ void Parser::DoStatement(int* tokenCounter, TokenList* tokens)
 }
 
 //expression → term PLUS expression | term MINUS expression | term
-void Parser::Expression(int* tokenCounter, TokenList* tokens)
+TokenType Parser::Expression(int* tokenCounter, TokenList* tokens)
 {
+    TokenType expressionType = TokenType::INVALID;
     //printf("Entered Expression\n");
-
+    
     //Term
     Term(tokenCounter, tokens);
 
@@ -505,6 +518,7 @@ void Parser::Expression(int* tokenCounter, TokenList* tokens)
     }
 
     //printf("Exited Expression\n");
+    return expressionType;
 }
 
 //term → factor MULT term | factor DIV term | factor
@@ -571,20 +585,30 @@ void Parser::Conditional(int* tokenCounter, TokenList* tokens)
     else
     {
         //Primary
-        Primary(tokenCounter, tokens);
+        if(Primary(tokenCounter, tokens) == NULL)
+        {
+           printf("SYNTAX ERROR");
+           exit(1);
+        }
 
         //RelationalOperator
-        RelationalOperator(tokenCounter, tokens);
+        if(RelationalOperator(tokenCounter, tokens) != NULL)
+        {
 
         //Primary
-        Primary(tokenCounter, tokens);
+           if(Primary(tokenCounter, tokens) == NULL)
+           {
+               printf("SYNTAX ERROR");
+               exit(1);
+           }
+        }
     }
 
     //printf("Exited Conditional\n");
 }
 
 //primary → ID | NUM | RealNUM
-void Parser::Primary(int* tokenCounter, TokenList* tokens)
+Token* Parser::Primary(int* tokenCounter, TokenList* tokens)
 {
     //printf("Entered Primary\n");
 
@@ -595,6 +619,11 @@ void Parser::Primary(int* tokenCounter, TokenList* tokens)
     {
         //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         (*tokenCounter)++;
+        return newToken;
+    }
+    else
+    {
+        return NULL;
     }
 
     //This gives a massive error
@@ -605,7 +634,7 @@ void Parser::Primary(int* tokenCounter, TokenList* tokens)
 }
 
 //relationalOperator → EQUAL | NotEQUAL | GREATER | GTEQ | LESS | LTEQ
-void Parser::RelationalOperator(int* tokenCounter, TokenList* tokens)
+Token* Parser::RelationalOperator(int* tokenCounter, TokenList* tokens)
 {
     //printf("Entered Relational Operator\n");
 
@@ -619,6 +648,11 @@ void Parser::RelationalOperator(int* tokenCounter, TokenList* tokens)
     {
         //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         (*tokenCounter)++;
+        return newToken;
+    }
+    else
+    {
+        return NULL;
     }
     // else
     // {
@@ -853,9 +887,23 @@ TokenType Parser::GetType(VariableDescriptor* variableDescriptor)
     return TokenType::INVALID;
 }
 
+bool Parser::VariableExists(Token *token)
+{
+    bool exists = false;
+    //cout << "Parser::VariableExists >> Entering" << endl;
+    //cout << "Checking to see if variable " << token->GetString() << " has already been defined" << endl;
+    for (int i = 0; i < variableDescriptors.size(); i++)
+    {
+        // strcmp(typeDescriptors[i]->typeName->GetString(),variableDescriptor->type->GetString())==0)
+        //cout << "Comparing to " << variableDescriptors[i]->variableName->GetString() << endl;
+        if (strcmp(variableDescriptors[i]->variableName->GetString(), token->GetString()) == 0)
+        {
+            //cout << "Found" << endl;
+            exists = true;
+            break;
+        }
+    }
 
-
-
-
-
-
+    //cout << "Parser::VariableExists << Leaving" << endl;
+    return exists;
+}

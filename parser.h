@@ -47,12 +47,12 @@ class Parser
         void WhileStatement(int* tokenCounter, TokenList* tokens);
         void AssignStatement(int* tokenCounter, TokenList* tokens);
         void DoStatement(int* tokenCounter, TokenList* tokens);
-        void Expression(int* tokenCounter, TokenList* tokens);
+        TokenType Expression(int* tokenCounter, TokenList* tokens);
         void Term(int* tokenCounter, TokenList* tokens);
         void Factor(int* tokenCounter, TokenList* tokens);
         void Conditional(int* tokenCounter, TokenList* tokens);
-        void Primary(int* tokenCounter, TokenList* tokens);
-        void RelationalOperator(int* tokenCounter, TokenList* tokens);
+        Token* Primary(int* tokenCounter, TokenList* tokens);
+        Token* RelationalOperator(int* tokenCounter, TokenList* tokens);
 
         //Newer Funcitons
         void PrintTypeDeclarations();
@@ -62,6 +62,8 @@ class Parser
         void CheckTypeMismatch();
 
         void ListAllPresentTypes();
+
+        bool VariableExists(Token* token);
 
         vector<Token*> GetNamedTokens(TokenType type);
         
