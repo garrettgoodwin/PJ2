@@ -21,6 +21,12 @@ void Parser::Parse(TokenList* tokens)
 
     ParseBody(&tokenCounter, tokens);
 
+    // if(variableDescriptors.size())
+    // {
+    //     printf("SYNTAX ERROR");
+    //     exit(1);
+    // }
+
     ListAllPresentTypes();
 }
 
@@ -58,9 +64,7 @@ void Parser::TypeDeclarations(int* tokenCounter, TokenList* tokens)
     }
     else
     {
-        //Not Sure if I should exit here
-        printf("SYNTAX ERROR");
-        exit(1);
+        //No Syntax Error Goes Here
     }
 }
 
@@ -80,6 +84,13 @@ void Parser::TypeDeclaration(int* tokenCounter, TokenList* tokens)
 {
     //idList
     vector<Token*>* returnIDs = IDList(tokenCounter, tokens);
+
+    //This does not fix: No syntax error when TYPE section has no types.
+    // if(returnIDs == NULL)
+    // {
+    //     printf("SYNTAX ERROR");
+    //     exit(1);
+    // }
 
     //COLON
     if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::COLON)
@@ -149,8 +160,9 @@ void Parser::VariableDeclarations(int* tokenCounter, TokenList* tokens)
     }
     else
     {
-        printf("SYNTAX ERROR");
-        exit(1);
+
+        //printf("SYNTAX ERROR");
+        //exit(1);
     }
 }
 
@@ -237,7 +249,16 @@ void Parser::ParseBody(int* tokenCounter, TokenList* tokens)
         (*tokenCounter)++;
 
         //StatementList
-        StatementList(tokenCounter, tokens);
+        //Check if Program section is empty
+        if(tokens->GetToken(*tokenCounter)->GetType() != TokenType::RightBRACE)
+        {
+            StatementList(tokenCounter, tokens);
+        }
+        else
+        {
+            printf("SYNTAX ERROR");
+            exit(1);
+        }
 
         //RightBrace
         //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
@@ -250,6 +271,11 @@ void Parser::ParseBody(int* tokenCounter, TokenList* tokens)
             printf("SYNTAX ERROR");
             exit(1);
         }
+    }
+    else
+    {
+        printf("SYNTAX ERROR");
+        exit(1);
     }
 	//printf("Exited Parse Body\n");
 }
@@ -348,6 +374,11 @@ void Parser::AssignStatement(int* tokenCounter, TokenList* tokens)
             {
                 (*tokenCounter)++;
             }
+            else
+            {
+                printf("SYNTAX ERROR");
+                exit(1);
+            }
         }
     }
 
@@ -382,6 +413,11 @@ void Parser::DoStatement(int* tokenCounter, TokenList* tokens)
             if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::SEMICOLON)
             {
                 (*tokenCounter)++;
+            }
+            else
+            {
+                printf("SYNTAX ERROR");
+                exit(1);
             }
         }
     }
@@ -500,6 +536,10 @@ void Parser::Primary(int* tokenCounter, TokenList* tokens)
         (*tokenCounter)++;
     }
 
+    //This gives a massive error
+    //printf("SYNTAX ERROR");
+    //exit(1);
+
     //printf("Exited Primary\n");
 }
 
@@ -519,7 +559,12 @@ void Parser::RelationalOperator(int* tokenCounter, TokenList* tokens)
         //printf("Read: %s \t\tType: %s\n", tokens->GetToken(*tokenCounter)->GetString(), TokenTypeToString(static_cast<int>(tokens->GetToken(*tokenCounter)->GetType())));
         (*tokenCounter)++;
     }
-
+    // else
+    // {
+        //This is causing an error, Goes to 50
+    //     printf("SYNTAX ERROR");
+    //     exit(1);
+    // }
     //printf("Exited Relational Operator\n");
 }
 
