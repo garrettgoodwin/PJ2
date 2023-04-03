@@ -81,7 +81,6 @@ void Parser::TypeDeclaration(int* tokenCounter, TokenList* tokens)
     //idList
     vector<Token*>* returnIDs = IDList(tokenCounter, tokens);
 
-    //This does not fix: No syntax error when TYPE section has no types.
     if(returnIDs->size() == 0)
     {
         printf("SYNTAX ERROR");
@@ -182,6 +181,13 @@ void Parser::VariableDeclaration(int* tokenCounter, TokenList* tokens)
 {
     //idList
     vector<Token*>* returnIDs = IDList(tokenCounter, tokens);
+
+    if(returnIDs->size() == 0)
+    {
+        printf("SYNTAX ERROR");
+        exit(1);
+    }
+
 
     //COLON
     if(tokens->GetToken(*tokenCounter)->GetType() == TokenType::COLON)
@@ -503,7 +509,9 @@ void Parser::Conditional(int* tokenCounter, TokenList* tokens)
     else
     {
         //Primary
-        if(Primary(tokenCounter, tokens) == NULL)
+
+        Token* test = Primary(tokenCounter, tokens);
+        if(test == NULL)
         {
            printf("SYNTAX ERROR");
            exit(1);
@@ -520,6 +528,28 @@ void Parser::Conditional(int* tokenCounter, TokenList* tokens)
                exit(1);
            }
         }
+        else 
+        {
+             if(test->GetType() != TokenType::ID)
+             {
+                 printf("TYPE MISMATCH 4 %d", test->GetLineNumber());
+                 exit(1);
+             }
+             else
+             {
+                // for(int i = 0; i < typeDescriptors.size();i++)
+                // {
+                //     if(typeDescriptors[i]->typeName->IsMatch(test->GetString()))
+                //     {
+                //         if(GetType(typeDescriptors[i]) != TokenType::BOOLEAN)
+                //         {
+                //             printf("TYPE MISMATCH 4 %d", test->GetLineNumber());
+                //             exit(1);
+                //         }
+                //     }
+                // }
+             }
+         }
     }
 }
 
@@ -645,7 +675,7 @@ void Parser::CheckDuplicateErrors()
       Token* type = typeDescriptors[i]->type;
       if(type->GetType() == TokenType::ID)
       {
-        for(int j = i; j < typeDescriptors.size();j++)
+        for(int j = i+1; j < typeDescriptors.size();j++)
         {
             if(typeDescriptors[j]->typeName->IsMatch(type->GetString()))
             {

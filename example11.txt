@@ -2,7 +2,7 @@ TYPE
       type1, type3 : INT;
       type2 : type1;
 VAR
-      var1 : type2;
+      : type2;
       var2 : type3;
 {
       var2 = var1;
